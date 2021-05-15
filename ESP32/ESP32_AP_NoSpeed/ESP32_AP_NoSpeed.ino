@@ -1,35 +1,22 @@
 #include <WiFi.h>
 #include <WiFiClient.h>
 #include <WiFiAP.h>
-#include <Robojax_L298N_DC_motor.h>
 
+#include <ESP32Servo.h> 
 
-#define LED_BUILTIN 19   // Set the GPIO pin where you connected your test LED or comment this line out if your dev board has a built-in LED
-#define BUZZER 21  //+~vcc  -~21
+Servo myservo;  // create servo object to control a servo
+int servoPin = 25; 
+
+#define LED_BUILTIN 2   // Set the GPIO pin where you connected your test LED or comment this line out if your dev board has a built-in LED
+#define BUZZER 21
 // motor 1 settings
-#define CHA 0
-#define ENA 25 // this pin must be PWM enabled pin if Arduino board is used
+
 #define IN1 33
 #define IN2 32
-
-
-
 
 // motor 2 settings
 #define IN3 22
 #define IN4 23
-#define ENB 26// this pin must be PWM enabled pin if Arduino board is used
-#define CHB 1
-
-const int CCW = 2; // do not change
-const int CW  = 1; // do not change
-
-
-#define motor1 1 // do not change
-#define motor2 2 // do not change
-
-// fore two motors without debut information
-Robojax_L298N_DC_motor robot(IN1, IN2, ENA, CHA, IN3, IN4, ENB, CHB, false);
 
 // Set these to your desired credentials.
 const char *ssid = "YHA";
@@ -37,61 +24,101 @@ const char *password = "168168168";
 
 WiFiServer server(8888);
 
+void setup() {
+  pinMode(LED_BUILTIN, OUTPUT);
+  pinMode(BUZZER, OUTPUT);
+  pinMode(IN1, OUTPUT);
+  pinMode(IN2, OUTPUT);
+  pinMode(IN3, OUTPUT);
+  pinMode(IN4, OUTPUT);
+  digitalWrite(BUZZER, HIGH);
 
+  Serial.begin(115200);
+  Serial.println();
+  Serial.println("Configuring access point...");
+
+  // You can remove the password parameter if you want the AP to be open.
+  WiFi.softAP(ssid, password);
+  IPAddress myIP = WiFi.softAPIP();
+  Serial.print("AP IP address: ");
+  Serial.println(myIP);
+  server.begin();
+
+  Serial.println("Server started");
+//  ESP32PWM::allocateTimer(0);
+//  ESP32PWM::allocateTimer(1);
+//  ESP32PWM::allocateTimer(2);
+//  ESP32PWM::allocateTimer(3);
+//  myservo.setPeriodHertz(50);// Standard 50hz servo
+  myservo.attach(servoPin, 500, 2400);
+  myservo.write(75);
+}
 
 
 void forward()
 {
-
+  myservo.write(75);
   Serial.println("前进");
-  robot.rotate(motor1, 70, CW);
-  robot.rotate(motor2, 70, CW);
-  delay(1000);
+  digitalWrite(IN1, LOW);
+  digitalWrite(IN2, HIGH);
+  digitalWrite(IN3, LOW);
+  digitalWrite(IN4, HIGH);
+  delay(500);
   stop1();
 }
 void back()
 {
-
+  myservo.write(75);
   Serial.println("后退");
-  robot.rotate(motor1, 70, CCW);
-  robot.rotate(motor2, 70, CCW);
-  delay(1000);
+  digitalWrite(IN2, LOW);
+  digitalWrite(IN1, HIGH);
+  digitalWrite(IN4, LOW);
+  digitalWrite(IN3, HIGH);
+  delay(500);
   stop1();
 }
 void left_forward()
 {
+  myservo.write(110);
   Serial.println("左前");
-
-  robot.brake(1);
-  robot.rotate(motor2, 70, CW);
-  delay(800);
+  digitalWrite(IN1, LOW);
+  digitalWrite(IN2, LOW);
+  digitalWrite(IN3, LOW);
+  digitalWrite(IN4, HIGH);
+  delay(300);
   stop1();
-  
 }
 void left_back()
 {
+  myservo.write(110);
   Serial.println("左后");
-  robot.brake(1);
-  robot.rotate(motor2, 70, CCW);
-  delay(800);
+  digitalWrite(IN1, LOW);
+  digitalWrite(IN2, LOW);
+  digitalWrite(IN4, LOW);
+  digitalWrite(IN3, HIGH);
+  delay(300);
   stop1();
 }
 void right_forward()
 {
-
+  myservo.write(40);
   Serial.println("右前");
-  robot.brake(2);
-  robot.rotate(motor1, 70, CW);
-  delay(800);
+  digitalWrite(IN1, LOW);
+  digitalWrite(IN2, HIGH);
+  digitalWrite(IN3, LOW);
+  digitalWrite(IN4, LOW);
+  delay(300);
   stop1();
 }
 void right_back()
 {
-
+  myservo.write(40);
   Serial.println("右后");
-  robot.brake(2);
-  robot.rotate(motor1, 70, CCW);
-  delay(800);
+  digitalWrite(IN2, LOW);
+  digitalWrite(IN1, HIGH);
+  digitalWrite(IN3, LOW);
+  digitalWrite(IN4, LOW);
+  delay(300);
   stop1();
 }
 //void high()
@@ -114,31 +141,16 @@ void right_back()
 void stop1()
 {
   Serial.println("停止");
-  robot.brake(1);
-  robot.brake(2);
+  digitalWrite(IN1, LOW);
+  digitalWrite(IN2, LOW);
+  digitalWrite(IN3, LOW);
+  digitalWrite(IN4, LOW);
+  myservo.write(75);
+
+//  robot.brake(1);
+//  robot.brake(2);
 }
 
-void setup() {
-  pinMode(LED_BUILTIN, OUTPUT);
-  digitalWrite(LED_BUILTIN, HIGH);
-  pinMode(BUZZER, OUTPUT);
-  digitalWrite(BUZZER, HIGH);
-
-  Serial.begin(115200);
-  Serial.println();
-  Serial.println("Configuring access point...");
-
-  // You can remove the password parameter if you want the AP to be open.
-  WiFi.softAP(ssid, password);
-  IPAddress myIP = WiFi.softAPIP();
-  Serial.print("AP IP address: ");
-  Serial.println(myIP);
-  server.begin();
-
-  Serial.println("Server started");
-  robot.begin();
-
-}
 void loop() {
   WiFiClient client = server.available();   // listen for incoming clients
 
@@ -185,9 +197,11 @@ void loop() {
         break;
 
         case '4':
-        digitalWrite(LED_BUILTIN, LOW);
-        delay(1000);
         digitalWrite(LED_BUILTIN, HIGH);
+        break;
+
+        case '6':
+        digitalWrite(LED_BUILTIN, LOW);
         break;
 
         case '5':

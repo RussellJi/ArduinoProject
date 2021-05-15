@@ -1,27 +1,20 @@
-
-
 #include <WiFi.h>
 #include <WiFiClient.h>
 #include <WiFiAP.h>
+
 #define RXD0 3
 #define TXD0 1
-
 
 // Set these to your desired credentials.
 const char *ssid = "YHA";
 const char *password = "168168168";
-
-
-WiFiServer server(8080);
-
+WiFiServer server(8888);
 
 void setup() {
 
   Serial.begin(115200);
   Serial2.begin(115200,SERIAL_8N1,RXD0,TXD0);
-  Serial.println();
-  Serial.println("Configuring access point...");
-
+  
   // You can remove the password parameter if you want the AP to be open.
   WiFi.softAP(ssid, password);
   IPAddress myIP = WiFi.softAPIP();
@@ -41,8 +34,8 @@ void loop() {
     while (client.connected()) {            // loop while the client's connected
       if (client.available()) {             // if there's bytes to read from the client,
         char c = client.read();             // read a byte, then
-        Serial.write(c);                    // print it out the serial monitor
-        Serial2.println(c);
+        Serial.print(c);                    // print it out the serial monitor
+        Serial2.write(c);
       }
     }
     // close the connection:
