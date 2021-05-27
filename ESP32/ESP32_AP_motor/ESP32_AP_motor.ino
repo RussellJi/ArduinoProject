@@ -44,18 +44,18 @@ void forward()
 {
 
   Serial.println("前进");
-  robot.rotate(motor1, 70, CW);
-  robot.rotate(motor2, 70, CW);
-  delay(1000);
+  robot.rotate(motor1, 60, CW);
+  robot.rotate(motor2, 60, CW);
+  delay(500);
   stop1();
 }
 void back()
 {
 
   Serial.println("后退");
-  robot.rotate(motor1, 70, CCW);
-  robot.rotate(motor2, 70, CCW);
-  delay(1000);
+  robot.rotate(motor1, 60, CCW);
+  robot.rotate(motor2, 60, CCW);
+  delay(500);
   stop1();
 }
 void left_forward()
@@ -63,8 +63,8 @@ void left_forward()
   Serial.println("左前");
 
   robot.brake(1);
-  robot.rotate(motor2, 70, CW);
-  delay(800);
+  robot.rotate(motor2, 60, CW);
+  delay(300);
   stop1();
   
 }
@@ -72,8 +72,8 @@ void left_back()
 {
   Serial.println("左后");
   robot.brake(1);
-  robot.rotate(motor2, 70, CCW);
-  delay(800);
+  robot.rotate(motor2, 60, CCW);
+  delay(300);
   stop1();
 }
 void right_forward()
@@ -81,8 +81,8 @@ void right_forward()
 
   Serial.println("右前");
   robot.brake(2);
-  robot.rotate(motor1, 70, CW);
-  delay(800);
+  robot.rotate(motor1, 60, CW);
+  delay(300);
   stop1();
 }
 void right_back()
@@ -90,8 +90,8 @@ void right_back()
 
   Serial.println("右后");
   robot.brake(2);
-  robot.rotate(motor1, 70, CCW);
-  delay(800);
+  robot.rotate(motor1, 60, CCW);
+  delay(300);
   stop1();
 }
 //void high()
